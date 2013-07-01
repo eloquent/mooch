@@ -1,1 +1,1 @@
-web: npm start
+web: node ./lib/mooch.js

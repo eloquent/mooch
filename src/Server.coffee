@@ -59,7 +59,7 @@ module.exports = class Server
         executeRequest(options).pipe response
 
     server.listen @_options.port
-    @_output.write util.format 'Server listening on localhost:%d.\n', @_options.port
+    @_output.write util.format 'Mooch listening on localhost:%d.\n', @_options.port
 
   _generateRequestToken: ->
     encodedConsumerKey = encodeURIComponent @_options.consumerKey
