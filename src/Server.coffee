@@ -8,7 +8,7 @@ module.exports = class Server
     @_options = options
     @_output = output
 
-    @_options.port = 80 if not @_options.port
+    @_options.port = 8000 if not @_options.port
     @_options.twitterUri = 'https://api.twitter.com' if not @_options.twitterUri
 
   start: ->
