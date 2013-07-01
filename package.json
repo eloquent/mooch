@@ -17,6 +17,10 @@
         "start": "node lib/mooch.js",
         "test": "TEST_ROOT=\"src\" ./node_modules/.bin/mocha"
     },
+    "engines": {
+        "node": "~0.10",
+        "npm":  "~1.2"
+    },
     "dependencies": {
         "request": "~2"
     },
