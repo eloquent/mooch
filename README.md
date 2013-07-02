@@ -3,7 +3,7 @@
 *A simple Twitter OAuth proxy.*
 
 [![Build Status]][Latest build]
-[![Coverage Status]][Test coverage report](https://coveralls.io/r/eloquent/mooch)
+[![Coverage Status]][Test coverage report]
 
 <!-- References -->
 [Build Status]: https://api.travis-ci.org/eloquent/mooch.png
