@@ -1,22 +1,25 @@
-http = require 'http'
-executeRequest = require 'request'
 util = require 'util'
 
 module.exports = class Server
 
-  constructor: (options, output = process.stdout) ->
+  constructor: (options, request = (require 'request'), http = (require 'http'), output = process.stdout) ->
+    throw 'Consumer key is required.' if not options.consumerKey
+    throw 'Consumer secret is required.' if not options.consumerSecret
+    options.port = 8000 if not options.port
+    options.twitterUri = 'https://api.twitter.com' if not options.twitterUri
+
     @_options = options
+    @_request = request
+    @_http = http
     @_output = output
 
-    @_options.port = 8000 if not @_options.port
-    @_options.twitterUri = 'https://api.twitter.com' if not @_options.twitterUri
-
-  start: ->
+  start: (callback) ->
     @_obtainToken (error, token) =>
       if error
-        return @_output.write 'Unable to obtain bearer token, shutting down.'
+        @_output.write 'Unable to obtain bearer token, shutting down.'
+        return callback error
       @_token = token
-      @_handle()
+      @_handle callback
 
   _obtainToken: (callback) ->
     options =
@@ -28,7 +31,7 @@ module.exports = class Server
         grant_type: 'client_credentials'
 
     @_output.write 'Obtaining bearer token... '
-    executeRequest options, (error, response, body) =>
+    @_request options, (error, response, body) =>
       if error
         @_output.write 'unknown error.\n'
         callback error
@@ -41,8 +44,8 @@ module.exports = class Server
           @_output.write util.format 'HTTP error (%s).\n', response.statusCode
           callback response
 
-  _handle: ->
-    server = http.createServer (request, response) =>
+  _handle: (callback) ->
+    server = @_http.createServer (request, response) =>
       requestBody = ''
       request.on 'readable', ->
         requestBody += request.read()
@@ -56,10 +59,11 @@ module.exports = class Server
         delete options.headers[property] for property of options.headers when property.toLowerCase() is 'host'
         options.headers.authorization = util.format 'Bearer %s', @_token
 
-        executeRequest(options).pipe response
+        @_request(options).pipe response
 
     server.listen @_options.port
     @_output.write util.format 'Mooch listening on localhost:%d.\n', @_options.port
+    callback null
 
   _generateRequestToken: ->
     encodedConsumerKey = encodeURIComponent @_options.consumerKey
