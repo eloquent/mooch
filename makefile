@@ -5,21 +5,21 @@ test:
 
 test-coverage:
 	$(MAKE) clean
-	$(MAKE) src-coverage
-	mkdir -p ./test/report
-	TEST_ROOT="src-coverage" ./node_modules/.bin/mocha --reporter html-cov > ./test/report/coverage.html
+	$(MAKE) lib
+	mkdir -p ./artifacts/tests
+	TEST_ROOT="lib" ./node_modules/.bin/mocha --require blanket --reporter html-cov > ./artifacts/tests/coverage.html
+
+travis:
+	$(MAKE) clean
+	$(MAKE) lib
+	mkdir -p ./artifacts/tests
+	TEST_ROOT="lib" ./node_modules/.bin/mocha --require blanket --reporter mocha-lcov-reporter | ./node_modules/.bin/coveralls
 
 lib: $(COFFEE_FILES)
 	./node_modules/.bin/coffee -co lib src
 
-src-coverage: $(COFFEE_FILES)
-	if ! [ -d node_modules/visionmedia-jscoverage ]; then npm install visionmedia-jscoverage; fi
-	$(MAKE) lib
-	./node_modules/visionmedia-jscoverage/jscoverage lib src-coverage
-
 clean:
-	rm -rf ./src-coverage
 	rm -rf ./lib
-	rm -rf ./test/report
+	rm -rf ./artifacts
 
-.PHONY: test test-coverage clean
+.PHONY: test test-coverage travis clean
