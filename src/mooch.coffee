@@ -14,8 +14,4 @@ options =
   consumerSecret: process.env.MOOCH_CONSUMER_SECRET
   twitterUri: process.env.MOOCH_TWITTER_URI
 server = new Server options
-server.listen process.env.PORT, ->
-  process.on 'SIGINT', ->
-    process.stdout.write '\nCaught SIGINT.\n'
-    server.close ->
-      process.exit()
+server.listen process.env.PORT

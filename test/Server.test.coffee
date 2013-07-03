@@ -10,12 +10,13 @@ file that was distributed with this source code.
 {assert, expect} = require 'chai'
 deepEqual = require 'deep-equal'
 http = require 'http'
+moment = require 'moment'
 portfinder = require 'portfinder'
 request = require 'request'
 sinon = require 'sinon'
 stream = require 'stream'
-Server = require '../' + process.env.TEST_ROOT + '/Server'
 util = require 'util'
+Server = require '../' + process.env.TEST_ROOT + '/Server'
 
 suite 'Server', =>
 
@@ -36,10 +37,11 @@ suite 'Server', =>
       @httpServer.emit 'listening'
     @http =
       createServer: sinon.stub().returns @httpServer
+    @moment = moment
     @output =
       write: sinon.spy()
 
-    @server = new Server @options, @request, @http, @output
+    @server = new Server @options, @request, @http, @moment, @output
 
     @obtainTokenOptions =
         uri: 'http://api.example.org/oauth2/token'
@@ -55,6 +57,7 @@ suite 'Server', =>
       assert.strictEqual @server._options, @options
       assert.strictEqual @server._request, @request
       assert.strictEqual @server._http, @http
+      assert.strictEqual @server._moment, @moment
       assert.strictEqual @server._output, @output
 
     test 'member defaults', =>
@@ -66,6 +69,7 @@ suite 'Server', =>
       assert.strictEqual @server._options.twitterUri, 'https://api.twitter.com'
       assert.strictEqual @server._request, request
       assert.strictEqual @server._http, http
+      assert.strictEqual @server._moment, moment
       assert.strictEqual @server._output, process.stdout
 
     test 'requires consumer key', =>
@@ -225,7 +229,7 @@ suite 'Server', =>
               consumerSecret: @consumerSecret
               twitterUri: util.format 'http://localhost:%d', @httpPort
 
-            @server = new Server @options, @request, @http, @output
+            @server = new Server @options, @request, @http, @moment, @output
             @server.listen @port, done
 
         @httpServer.listen port

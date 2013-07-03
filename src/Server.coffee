@@ -11,7 +11,7 @@ util = require 'util'
 
 module.exports = class Server
 
-  constructor: (options, request = (require 'request'), http = (require 'http'), output = process.stdout) ->
+  constructor: (options, request = (require 'request'), http = (require 'http'), moment = (require 'moment'), output = process.stdout) ->
     throw new Error 'Consumer key is required.' if not options.consumerKey
     throw new Error 'Consumer secret is required.' if not options.consumerSecret
     options.twitterUri = 'https://api.twitter.com' if not options.twitterUri
@@ -19,6 +19,7 @@ module.exports = class Server
     @_options = options
     @_request = request
     @_http = http
+    @_moment = moment
     @_output = output
 
   listen: (port = 8000, callback) ->
@@ -80,7 +81,21 @@ module.exports = class Server
         delete options.headers[property] for property of options.headers when property.toLowerCase() is 'host'
         options.headers.authorization = util.format 'Bearer %s', @_token if !options.headers.authorization?
 
-        @_request(options).pipe response
+        contentLength = 0
+        innerRequest = @_request options
+        innerRequest.on 'data', (chunk) =>
+          contentLength += chunk.length
+        innerRequest.on 'end', =>
+          @_output.write util.format \
+            '%s - - [%s] "%s %s HTTP/%s" %s %s\n',
+            request.connection.remoteAddress,
+            @_moment().format('DD/MMM/YYYY:HH:mm:ss ZZ'),
+            request.method,
+            request.url,
+            request.httpVersion,
+            response.statusCode,
+            contentLength or '-'
+        innerRequest.pipe response
 
     @_server.on 'listening', =>
       @_output.write util.format 'Mooch listening on port %d.\n', port
