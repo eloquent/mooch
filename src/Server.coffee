@@ -12,9 +12,8 @@ util = require 'util'
 module.exports = class Server
 
   constructor: (options, request = (require 'request'), http = (require 'http'), output = process.stdout) ->
-    throw 'Consumer key is required.' if not options.consumerKey
-    throw 'Consumer secret is required.' if not options.consumerSecret
-    options.port = 8000 if not options.port
+    throw new Error 'Consumer key is required.' if not options.consumerKey
+    throw new Error 'Consumer secret is required.' if not options.consumerSecret
     options.twitterUri = 'https://api.twitter.com' if not options.twitterUri
 
     @_options = options
@@ -22,13 +21,26 @@ module.exports = class Server
     @_http = http
     @_output = output
 
-  start: (callback) ->
+  listen: (port = 8000, callback) ->
     @_obtainToken (error, token) =>
       if error
-        @_output.write 'Unable to obtain bearer token, shutting down.'
-        return callback error
+        @_output.write 'Unable to obtain bearer token, shutting down Mooch server.\n'
+        callback error if callback
+        return
       @_token = token
-      @_handle callback
+      @_handle port, callback
+
+  close: (callback) ->
+    if @_server
+      @_output.write 'Shutting down Mooch server... '
+      @_server.close (error) =>
+        if error
+          @_output.write 'failed.\n'
+          callback error if callback
+          return
+        delete @_server
+        @_output.write 'done.\n'
+        callback null if callback
 
   _obtainToken: (callback) ->
     options =
@@ -43,18 +55,18 @@ module.exports = class Server
     @_request options, (error, response, body) =>
       if error
         @_output.write 'unknown error.\n'
-        callback error
+        callback error if callback
       else
         if response.statusCode is 200
           responseVariables = JSON.parse body
           @_output.write 'done.\n'
-          callback null, responseVariables.access_token
+          callback null, responseVariables.access_token if callback
         else
           @_output.write util.format 'HTTP error (%s).\n', response.statusCode
-          callback response
+          callback response if callback
 
-  _handle: (callback) ->
-    server = @_http.createServer (request, response) =>
+  _handle: (port, callback) ->
+    @_server = @_http.createServer (request, response) =>
       requestBody = ''
       request.on 'readable', ->
         requestBody += request.read()
@@ -66,13 +78,14 @@ module.exports = class Server
           body: requestBody
           followRedirect: false
         delete options.headers[property] for property of options.headers when property.toLowerCase() is 'host'
-        options.headers.authorization = util.format 'Bearer %s', @_token
+        options.headers.authorization = util.format 'Bearer %s', @_token if !options.headers.authorization?
 
         @_request(options).pipe response
 
-    server.listen @_options.port
-    @_output.write util.format 'Mooch listening on localhost:%d.\n', @_options.port
-    callback null
+    @_server.on 'listening', =>
+      @_output.write util.format 'Mooch listening on port %d.\n', port
+      callback null if callback
+    @_server.listen port
 
   _generateRequestToken: ->
     encodedConsumerKey = encodeURIComponent @_options.consumerKey
