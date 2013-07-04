@@ -4,8 +4,7 @@
   "dependencies": {
     "moment": {
       "version": "2.0.0",
-      "from": "moment@~2",
-      "resolved": "https://registry.npmjs.org/moment/-/moment-2.0.0.tgz"
+      "from": "moment@~2"
     },
     "request": {
       "version": "2.21.0",
@@ -64,7 +63,7 @@
               }
             },
             "cryptiles": {
-              "version": "0.2.1",
+              "version": "0.2.2",
               "from": "cryptiles@0.2.x"
             },
             "sntp": {

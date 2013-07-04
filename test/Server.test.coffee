@@ -8,14 +8,12 @@ file that was distributed with this source code.
 ###
 
 {assert, expect} = require 'chai'
-deepEqual = require 'deep-equal'
 http = require 'http'
-moment = require 'moment'
 portfinder = require 'portfinder'
 request = require 'request'
 sinon = require 'sinon'
-stream = require 'stream'
 util = require 'util'
+Logger = require '../' + process.env.TEST_ROOT + '/Logger'
 Server = require '../' + process.env.TEST_ROOT + '/Server'
 
 suite 'Server', =>
@@ -37,11 +35,9 @@ suite 'Server', =>
       @httpServer.emit 'listening'
     @http =
       createServer: sinon.stub().returns @httpServer
-    @moment = moment
-    @output =
-      write: sinon.spy()
+    @logger = sinon.createStubInstance Logger
 
-    @server = new Server @options, @request, @http, @moment, @output
+    @server = new Server @options, @request, @http, @logger
 
     @obtainTokenOptions =
         uri: 'http://api.example.org/oauth2/token'
@@ -57,8 +53,7 @@ suite 'Server', =>
       assert.strictEqual @server._options, @options
       assert.strictEqual @server._request, @request
       assert.strictEqual @server._http, @http
-      assert.strictEqual @server._moment, @moment
-      assert.strictEqual @server._output, @output
+      assert.strictEqual @server._logger, @logger
 
     test 'member defaults', =>
       @options =
@@ -69,8 +64,7 @@ suite 'Server', =>
       assert.strictEqual @server._options.twitterUri, 'https://api.twitter.com'
       assert.strictEqual @server._request, request
       assert.strictEqual @server._http, http
-      assert.strictEqual @server._moment, moment
-      assert.strictEqual @server._output, process.stdout
+      assert.instanceOf @server._logger, Logger
 
     test 'requires consumer key', =>
       expect(=> new Server consumerSecret: 'L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg').to.throw 'Consumer key is required.'
@@ -96,11 +90,11 @@ suite 'Server', =>
         sinon.assert.calledOnce @httpServer.listen
         sinon.assert.calledWithExactly @httpServer.listen, 111
         sinon.assert.callOrder \
-          @output.write.withArgs('Obtaining bearer token... '),
+          @logger.log.withArgs('info', 'Obtaining bearer token.'),
           @request,
-          @output.write.withArgs('done.\n'),
+          @logger.log.withArgs('info', 'Successfully obtained bearer token.'),
           @http.createServer,
-          @output.write.withArgs('Mooch listening on port 111.\n')
+          @logger.log.withArgs('info', 'Listening on port %d.', 111)
         done()
 
     test 'port defaults to 8000', (done) =>
@@ -119,11 +113,11 @@ suite 'Server', =>
         sinon.assert.calledOnce @httpServer.listen
         sinon.assert.calledWithExactly @httpServer.listen, 8000
         sinon.assert.callOrder \
-          @output.write.withArgs('Obtaining bearer token... '),
+          @logger.log.withArgs('info', 'Obtaining bearer token.'),
           @request,
-          @output.write.withArgs('done.\n'),
+          @logger.log.withArgs('info', 'Successfully obtained bearer token.'),
           @http.createServer,
-          @output.write.withArgs('Mooch listening on port 8000.\n')
+          @logger.log.withArgs('info', 'Listening on port %d.', 8000)
         done()
 
     test 'returns an error when obtaining a token results in an HTTP error', (done) =>
@@ -139,9 +133,9 @@ suite 'Server', =>
         sinon.assert.calledWithExactly @request, @obtainTokenOptions, sinon.match.func
         sinon.assert.notCalled @http.createServer
         sinon.assert.callOrder \
-          @output.write.withArgs('Obtaining bearer token... '),
+          @logger.log.withArgs('info', 'Obtaining bearer token.'),
           @request,
-          @output.write.withArgs('HTTP error (500).\n')
+          @logger.error.withArgs('Unable to obtain bearer token. Unexpected HTTP error (%s).', 500)
         done()
 
     test 'returns an error when obtaining a token results in an error', (done) =>
@@ -154,47 +148,9 @@ suite 'Server', =>
         sinon.assert.calledWithExactly @request, @obtainTokenOptions, sinon.match.func
         sinon.assert.notCalled @http.createServer
         sinon.assert.callOrder \
-          @output.write.withArgs('Obtaining bearer token... '),
+          @logger.log.withArgs('info', 'Obtaining bearer token.'),
           @request,
-          @output.write.withArgs('unknown error.\n')
-        done()
-
-  suite '#close()', =>
-
-    setup (done) =>
-      response =
-        statusCode: 200
-      responseBody = '{"token_type":"bearer","access_token":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%2FAAAAAAAAAAAAAAAAAAAA%3DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"}'
-      @request.callsArgOnWith 1, @server, null, response, responseBody
-      @server.listen 111, (error) =>
-        done error
-
-    test 'successful shutdown', (done) =>
-      sinon.restore @httpServer.close
-      sinon.stub(@httpServer, 'close').callsArgOnWith 0, @server, null
-
-      @server.close (error) =>
-        assert.isNull error
-        sinon.assert.calledOnce @httpServer.close
-        sinon.assert.calledWithExactly @httpServer.close, sinon.match.func
-        sinon.assert.callOrder \
-          @output.write.withArgs('Shutting down Mooch server... '),
-          @httpServer.close,
-          @output.write.withArgs('done.\n')
-        done()
-
-    test 'failed shutdown', (done) =>
-      sinon.restore @httpServer.close
-      sinon.stub(@httpServer, 'close').callsArgOnWith 0, @server, 'error'
-
-      @server.close (error) =>
-        assert.strictEqual error, 'error'
-        sinon.assert.calledOnce @httpServer.close
-        sinon.assert.calledWithExactly @httpServer.close, sinon.match.func
-        sinon.assert.callOrder \
-          @output.write.withArgs('Shutting down Mooch server... '),
-          @httpServer.close,
-          @output.write.withArgs('failed.\n')
+          @logger.error.withArgs('Unable to obtain bearer token. Unexpected error.')
         done()
 
   suite 'functional tests', =>
@@ -229,15 +185,13 @@ suite 'Server', =>
               consumerSecret: @consumerSecret
               twitterUri: util.format 'http://localhost:%d', @httpPort
 
-            @server = new Server @options, @request, @http, @moment, @output
+            @server = new Server @options, @request, @http, @logger
             @server.listen @port, done
 
         @httpServer.listen port
 
-    teardown (done) =>
+    teardown =>
       sinon.restore @http, 'createServer'
-      @server.close =>
-        @httpServer.close done
 
     test 'correctly proxies requests', (done) =>
       options =
@@ -263,6 +217,7 @@ suite 'Server', =>
       request options, (error, response, body) =>
         assert.isNull error
         sinon.assert.calledWith @request, expectedOptions
+        sinon.assert.calledWith @logger.log, 'request', '%s "%s %s HTTP/%s" %s %s', '127.0.0.1', 'POST', '/path/to/foo', '1.1', 200, 6
         assert.strictEqual body, 'Mooch!'
         done()
 
@@ -291,5 +246,6 @@ suite 'Server', =>
       request options, (error, response, body) =>
         assert.isNull error
         sinon.assert.calledWith @request, expectedOptions
+        sinon.assert.calledWith @logger.log, 'request', '%s "%s %s HTTP/%s" %s %s', '127.0.0.1', 'POST', '/path/to/foo', '1.1', 200, 6
         assert.strictEqual body, 'Mooch!'
         done()

@@ -8,10 +8,16 @@ file that was distributed with this source code.
 ###
 
 util = require 'util'
+Logger = require './Logger'
 
 module.exports = class Server
 
-  constructor: (options, request = (require 'request'), http = (require 'http'), moment = (require 'moment'), output = process.stdout) ->
+  constructor: ( \
+    options,
+    request = (require 'request'),
+    http = (require 'http'),
+    logger = new Logger
+  ) ->
     throw new Error 'Consumer key is required.' if not options.consumerKey
     throw new Error 'Consumer secret is required.' if not options.consumerSecret
     options.twitterUri = 'https://api.twitter.com' if not options.twitterUri
@@ -19,29 +25,16 @@ module.exports = class Server
     @_options = options
     @_request = request
     @_http = http
-    @_moment = moment
-    @_output = output
+    @_logger = logger
 
   listen: (port = 8000, callback) ->
     @_obtainToken (error, token) =>
       if error
-        @_output.write 'Unable to obtain bearer token, shutting down Mooch server.\n'
+        @_logger.error 'Unable to obtain bearer token, shutting down.'
         callback error if callback
         return
       @_token = token
       @_handle port, callback
-
-  close: (callback) ->
-    if @_server
-      @_output.write 'Shutting down Mooch server... '
-      @_server.close (error) =>
-        if error
-          @_output.write 'failed.\n'
-          callback error if callback
-          return
-        delete @_server
-        @_output.write 'done.\n'
-        callback null if callback
 
   _obtainToken: (callback) ->
     options =
@@ -52,18 +45,18 @@ module.exports = class Server
       form:
         grant_type: 'client_credentials'
 
-    @_output.write 'Obtaining bearer token... '
+    @_logger.log 'info', 'Obtaining bearer token.'
     @_request options, (error, response, body) =>
       if error
-        @_output.write 'unknown error.\n'
+        @_logger.error 'Unable to obtain bearer token. Unexpected error.'
         callback error if callback
       else
         if response.statusCode is 200
           responseVariables = JSON.parse body
-          @_output.write 'done.\n'
+          @_logger.log 'info', 'Successfully obtained bearer token.'
           callback null, responseVariables.access_token if callback
         else
-          @_output.write util.format 'HTTP error (%s).\n', response.statusCode
+          @_logger.error 'Unable to obtain bearer token. Unexpected HTTP error (%s).', response.statusCode
           callback response if callback
 
   _handle: (port, callback) ->
@@ -86,10 +79,10 @@ module.exports = class Server
         innerRequest.on 'data', (chunk) =>
           contentLength += chunk.length
         innerRequest.on 'end', =>
-          @_output.write util.format \
-            '%s - - [%s] "%s %s HTTP/%s" %s %s\n',
+          @_logger.log \
+            'request',
+            '%s "%s %s HTTP/%s" %s %s',
             request.connection.remoteAddress,
-            @_moment().format('DD/MMM/YYYY:HH:mm:ss ZZ'),
             request.method,
             request.url,
             request.httpVersion,
@@ -98,7 +91,7 @@ module.exports = class Server
         innerRequest.pipe response
 
     @_server.on 'listening', =>
-      @_output.write util.format 'Mooch listening on port %d.\n', port
+      @_logger.log 'info', 'Listening on port %d.', port
       callback null if callback
     @_server.listen port
 
