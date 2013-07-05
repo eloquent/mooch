@@ -66,8 +66,8 @@ Twitter application created in [step 1].
 
 ##### Example authentication configuration
 
-    heroku config:set MOOCH_CONSUMER_KEY=nQUZqUgo3lCAMBjBKPYRA
-    heroku config:set MOOCH_CONSUMER_SECRET=Na9zq5alYmit2iBIA8Wp04qyqiw3mH0tT9cdYVEcuM
+    heroku config:set MOOCH_CONSUMER_KEY=xvz1evFS4wEEPTGEFPHBog
+    heroku config:set MOOCH_CONSUMER_SECRET=L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg
 
 #### Step 4.2: (optional): Set up allowed and forbidden paths
 
@@ -116,7 +116,7 @@ dashboard] for the service's location.
 environment variables to be present. Fortunately it is possible to do all of
 this in a single line (at least in bash):
 
-    MOOCH_CONSUMER_KEY=nQUZqUgo3lCAMBjBKPYRA MOOCH_CONSUMER_SECRET=Na9zq5alYmit2iBIA8Wp04qyqiw3mH0tT9cdYVEcuM npm start
+    MOOCH_CONSUMER_KEY=xvz1evFS4wEEPTGEFPHBog MOOCH_CONSUMER_SECRET=L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg npm start
 
 <!-- References -->
 [@CountingCrows_]: https://twitter.com/CountingCrows_
