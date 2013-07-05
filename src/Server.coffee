@@ -116,6 +116,11 @@ module.exports = class Server
     new Buffer(encodedRequestPair).toString 'base64'
 
   _requestAllowed: (request) ->
-    return false for pattern in @_options.allow when !request.url.match pattern
+    allowMatched = @_options.allow.length < 1
+    for pattern in @_options.allow
+      if request.url.match pattern
+        allowMatched = true
+        break
+    return false if !allowMatched
     return false for pattern in @_options.deny when request.url.match pattern
     return true
