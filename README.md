@@ -46,20 +46,30 @@ deployment process requires the [Heroku Toolbelt] application.
 
 ### Step 2: Get *Mooch*
 
-- Obtain *Mooch* by one of the following methods:
-    - Clone the Git repository (`git clone git@github.com:eloquent/mooch.git`).
-    - Download the [latest release] and extract it.
-    - Install via NPM (`npm install mooch`).
+- Clone the Git repository (`git clone git@github.com:eloquent/mooch.git`).
 - Change into the *Mooch* root directory.
 
 ### Step 3: Create a Heroku app
 
 - Sign in with [Heroku Toolbelt][] (`heroku login`).
-- Create a new app with `heroku create` (must be in the *Mooch* root directory).
+- Create a new app with `heroku create`.
 
 ### Step 4: Configuration
 
-#### Step 4.1: Set up allowed and forbidden paths (optional)
+#### Step 4.1: Set up OAuth credentials
+
+Variables: **MOOCH_CONSUMER_KEY** and **MOOCH_CONSUMER_SECRET**.
+
+*Mooch* authenticates requests to the Twitter API using the [application-only
+authentication] method. This requires the consumer key and secret from the
+Twitter application created in [step 1].
+
+##### Example authentication configuration
+
+    heroku config:set MOOCH_CONSUMER_KEY=nQUZqUgo3lCAMBjBKPYRA
+    heroku config:set MOOCH_CONSUMER_SECRET=Na9zq5alYmit2iBIA8Wp04qyqiw3mH0tT9cdYVEcuM
+
+#### Step 4.2: (optional): Set up allowed and forbidden paths
 
 Variables: **MOOCH_ALLOW** and **MOOCH_DENY**.
 
@@ -93,20 +103,9 @@ the exclusion of Justin Bieber.
     heroku config:set MOOCH_ALLOW='["^/1\\.1/statuses/user_timeline\\.json","^/1\\.1/statuses/show\\.json"]'
     heroku config:set MOOCH_DENY='["justinbieber"]'
 
-#### Step 4.2 Set up OAuth credentials
+### Step 5: Deploy
 
-Variables: **MOOCH_CONSUMER_KEY** and **MOOCH_CONSUMER_SECRET**.
-
-*Mooch* authenticates requests to the Twitter API using the [application-only
-authentication] method. This requires the consumer key and secret from the
-Twitter application created in [step 1].
-
-##### Example authentication configuration
-
-    heroku config:set MOOCH_CONSUMER_KEY=nQUZqUgo3lCAMBjBKPYRA
-    heroku config:set MOOCH_CONSUMER_SECRET=Na9zq5alYmit2iBIA8Wp04qyqiw3mH0tT9cdYVEcuM
-
-### Setup complete
+- `git push heroku master`
 
 The new *Mooch* service should now be ready for use. Check the [Heroku
 dashboard] for the service's location.
