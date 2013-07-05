@@ -1,1 +1,1 @@
-web: ./node_modules/.bin/coffee src/mooch.coffee
+web: node ./lib/mooch.js
