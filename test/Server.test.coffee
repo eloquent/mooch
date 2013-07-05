@@ -161,8 +161,7 @@ suite 'Server', =>
       sinon.spy @http, 'createServer'
 
       portfinder.getPort (error, port) =>
-        if error
-          return done error
+        return done error if error
 
         @httpPort = port
 
@@ -176,14 +175,15 @@ suite 'Server', =>
 
         @httpServer.on 'listening', =>
           portfinder.getPort (error, port) =>
-            if error
-              return done error
+            return done error if error
 
             @port = port
             @options =
               consumerKey: @consumerKey
               consumerSecret: @consumerSecret
               twitterUri: util.format 'http://localhost:%d', @httpPort
+              allow: [/^\/path\/to/]
+              deny: [/bar/]
 
             @server = new Server @options, @request, @http, @logger
             @server.listen @port, done
@@ -248,4 +248,24 @@ suite 'Server', =>
         sinon.assert.calledWith @request, expectedOptions
         sinon.assert.calledWith @logger.log, 'request', '%s "%s %s HTTP/%s" %s %s', '127.0.0.1', 'POST', '/path/to/foo', '1.1', 200, 6
         assert.strictEqual body, 'Mooch!'
+        done()
+
+    test 'only allows paths matching the allow rules', (done) =>
+      options =
+        uri: util.format 'http://localhost:%d/foo', @port
+
+      request options, (error, response, body) =>
+        assert.isNull error
+        sinon.assert.calledWith @logger.log, 'request', '%s "%s %s HTTP/%s" 403 -', '127.0.0.1', 'GET', '/foo', '1.1'
+        assert.strictEqual body, '{"errors":[{"message":"Forbidden.","code":64}]}'
+        done()
+
+    test 'does not allow paths matching the deny rules', (done) =>
+      options =
+        uri: util.format 'http://localhost:%d/path/to/bar', @port
+
+      request options, (error, response, body) =>
+        assert.isNull error
+        sinon.assert.calledWith @logger.log, 'request', '%s "%s %s HTTP/%s" 403 -', '127.0.0.1', 'GET', '/path/to/bar', '1.1'
+        assert.strictEqual body, '{"errors":[{"message":"Forbidden.","code":64}]}'
         done()

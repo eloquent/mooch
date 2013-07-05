@@ -21,6 +21,8 @@ module.exports = class Server
     throw new Error 'Consumer key is required.' if not options.consumerKey
     throw new Error 'Consumer secret is required.' if not options.consumerSecret
     options.twitterUri = 'https://api.twitter.com' if not options.twitterUri
+    options.allow = [] if not options.allow
+    options.deny = [] if not options.deny
 
     @_options = options
     @_request = request
@@ -61,6 +63,18 @@ module.exports = class Server
 
   _handle: (port, callback) ->
     @_server = @_http.createServer (request, response) =>
+      if !@_requestAllowed request
+        response.writeHead 403, 'content-type': 'application/json'
+        response.end '{"errors":[{"message":"Forbidden.","code":64}]}'
+        @_logger.log 'info', 'Client denied by configuration rules.'
+        @_logger.log \
+          'request',
+          '%s "%s %s HTTP/%s" 403 -',
+          request.connection.remoteAddress,
+          request.method,
+          request.url,
+          request.httpVersion
+        return
       requestBody = ''
       request.on 'readable', ->
         requestBody += request.read()
@@ -100,3 +114,8 @@ module.exports = class Server
     encodedConsumerSecret = encodeURIComponent @_options.consumerSecret
     encodedRequestPair = util.format '%s:%s', encodedConsumerKey, encodedConsumerSecret
     new Buffer(encodedRequestPair).toString 'base64'
+
+  _requestAllowed: (request) ->
+    return false for pattern in @_options.allow when !request.url.match pattern
+    return false for pattern in @_options.deny when request.url.match pattern
+    return true
