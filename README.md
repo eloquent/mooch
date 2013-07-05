@@ -111,6 +111,14 @@ Twitter application created in [step 1].
 The new *Mooch* service should now be ready for use. Check the [Heroku
 dashboard] for the service's location.
 
+## Running locally
+
+*Mooch* can be started locally using `npm start`, but it requires some
+environment variables to be present. Fortunately it is possible to do all of
+this in a single line (at least in bash):
+
+    MOOCH_CONSUMER_KEY=nQUZqUgo3lCAMBjBKPYRA MOOCH_CONSUMER_SECRET=Na9zq5alYmit2iBIA8Wp04qyqiw3mH0tT9cdYVEcuM npm start
+
 <!-- References -->
 [@CountingCrows_]: https://twitter.com/CountingCrows_
 [application-only authentication]: https://dev.twitter.com/docs/auth/application-only-auth
