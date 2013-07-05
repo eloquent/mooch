@@ -7,6 +7,8 @@ For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 ###
 
+querystring = require 'querystring'
+url = require 'url'
 util = require 'util'
 Logger = require './Logger'
 
@@ -116,11 +118,15 @@ module.exports = class Server
     new Buffer(encodedRequestPair).toString 'base64'
 
   _requestAllowed: (request) ->
+    uriParts = url.parse request.url
+    normalizedUri = url.format
+      pathname: decodeURIComponent uriParts.pathname
+      search: querystring.stringify querystring.parse uriParts.query
     allowMatched = @_options.allow.length < 1
     for pattern in @_options.allow
-      if request.url.match pattern
+      if normalizedUri.match pattern
         allowMatched = true
         break
     return false if !allowMatched
-    return false for pattern in @_options.deny when request.url.match pattern
+    return false for pattern in @_options.deny when normalizedUri.match pattern
     return true

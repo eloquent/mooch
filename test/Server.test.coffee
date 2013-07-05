@@ -262,10 +262,10 @@ suite 'Server', =>
 
     test 'does not allow paths matching the deny rules', (done) =>
       options =
-        uri: util.format 'http://localhost:%d/path/to/bar', @port
+        uri: util.format 'http://localhost:%d/path/to/%62%61%72', @port
 
       request options, (error, response, body) =>
         assert.isNull error
-        sinon.assert.calledWith @logger.log, 'request', '%s "%s %s HTTP/%s" 403 -', '127.0.0.1', 'GET', '/path/to/bar', '1.1'
+        sinon.assert.calledWith @logger.log, 'request', '%s "%s %s HTTP/%s" 403 -', '127.0.0.1', 'GET', '/path/to/%62%61%72', '1.1'
         assert.strictEqual body, '{"errors":[{"message":"Forbidden.","code":64}]}'
         done()

@@ -101,7 +101,7 @@ This configuration would allow access to any user's timeline or statuses, with
 the exclusion of Justin Bieber.
 
     heroku config:set MOOCH_ALLOW='["^/1\\.1/statuses/user_timeline\\.json","^/1\\.1/statuses/show\\.json"]'
-    heroku config:set MOOCH_DENY='["justinbieber"]'
+    heroku config:set MOOCH_DENY='["\\bscreen_name=justinbieber\\b"]'
 
 ### Step 5: Deploy
 
