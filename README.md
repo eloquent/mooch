@@ -16,13 +16,13 @@ extremely simple.
 
 In June 2013, [Twitter officially retired version 1.0 of their API]. Since
 version 1.1 of the Twitter API [requires OAuth authentication for every
-request], this effectively meant the end of client-side only Twitter
-applications.
+request], this effectively meant the end of client-side only, unauthenticated
+Twitter applications.
 
 This is still the case. It is *still* impossible to write a secure, client-side
-only application that uses the Twitter API, even for information that is
-publicly available without authentication from the Twitter website. That's where
-*Mooch* comes in.
+only application that uses the Twitter API without forcing users to log in via
+Twitter, even for information that is publicly available without authentication
+from the Twitter website. That's where *Mooch* comes in.
 
 *Mooch* is the simplest possible server-side component for creating primarily
 client-side Twitter applications.
@@ -48,6 +48,7 @@ deployment process requires the [Heroku Toolbelt] application.
 
 - Clone the Git repository (`git clone git@github.com:eloquent/mooch.git`).
 - Change into the *Mooch* root directory.
+- Check out the master branch (`git checkout master`).
 
 ### Step 3: Create a Heroku app
 
