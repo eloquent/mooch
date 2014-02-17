@@ -2,12 +2,12 @@
 
 ## 0.1.2 (2013-07-05)
 
-* **[IMPROVED]** Improved documentation.
+- **[IMPROVED]** Improved documentation
 
 ## 0.1.1 (2013-07-05)
 
-* **[IMPROVED]** Improved security.
+- **[IMPROVED]** Improved security
 
 ## 0.1.0 (2013-07-05)
 
-* Initial implementation.
+- **[NEW]** Initial implementation

@@ -2,8 +2,9 @@
 
 *A simple Twitter OAuth proxy.*
 
-[![Build Status]][Latest build]
-[![Coverage Status]][Test coverage report]
+[![The most recent stable version is 0.1.2][version-image]][Semantic versioning]
+[![Current build status image][build-image]][Current build status]
+[![Current coverage status image][coverage-image]][Current coverage status]
 
 ## What is Mooch?
 
@@ -120,10 +121,9 @@ this in a single line (at least in bash):
     MOOCH_CONSUMER_KEY=xvz1evFS4wEEPTGEFPHBog MOOCH_CONSUMER_SECRET=L8qq9PZyRg6ieKGEKhZolGC0vJWLw8iEJ88DRdyOg npm start
 
 <!-- References -->
+
 [@CountingCrows_]: https://twitter.com/CountingCrows_
 [application-only authentication]: https://dev.twitter.com/docs/auth/application-only-auth
-[Build Status]: https://api.travis-ci.org/eloquent/mooch.png
-[Coverage Status]: https://coveralls.io/repos/eloquent/mooch/badge.png
 [Create a new application]: https://dev.twitter.com/apps/new
 [error response]: https://dev.twitter.com/docs/error-codes-responses
 [example *Mooch* service]: http://mooch-demo.herokuapp.com/1.1/statuses/user_timeline.json?screen_name=CountingCrows_
@@ -131,12 +131,16 @@ this in a single line (at least in bash):
 [Heroku Toolbelt]: https://toolbelt.heroku.com/
 [Heroku]: https://www.heroku.com/
 [JSON]: http://en.wikipedia.org/wiki/JSON
-[Latest build]: http://travis-ci.org/eloquent/mooch
-[latest release]: https://github.com/eloquent/mooch/archive/master.zip
 [OAuth]: http://oauth.net/
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [requires OAuth authentication for every request]: https://dev.twitter.com/docs/api/1.1/overview#Authentication_required_on_all_endpoints
 [step 1]: #step-1-create-a-twitter-app
-[Test coverage report]: https://coveralls.io/r/eloquent/mooch
 [Twitter API]: https://dev.twitter.com/docs/api
 [Twitter officially retired version 1.0 of their API]: https://dev.twitter.com/blog/api-v1-is-retired
+
+[build-image]: http://img.shields.io/travis/eloquent/php-lcs/develop.svg "Current build status for the develop branch"
+[Current build status]: https://travis-ci.org/eloquent/php-lcs
+[coverage-image]: http://img.shields.io/coveralls/eloquent/php-lcs/develop.svg "Current test coverage for the develop branch"
+[Current coverage status]: https://coveralls.io/r/eloquent/php-lcs
+[Semantic versioning]: http://semver.org/
+[version-image]: http://img.shields.io/:semver-0.1.2-brightgreen.svg "This project uses semantic versioning"
