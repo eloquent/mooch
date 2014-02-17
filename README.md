@@ -2,7 +2,7 @@
 
 *A simple Twitter OAuth proxy.*
 
-[![The most recent stable version is 0.1.2][version-image]][Semantic versioning]
+[![The most recent stable version is 0.1.3][version-image]][Semantic versioning]
 [![Current build status image][build-image]][Current build status]
 [![Current coverage status image][coverage-image]][Current coverage status]
 
@@ -143,4 +143,4 @@ this in a single line (at least in bash):
 [coverage-image]: http://img.shields.io/coveralls/eloquent/mooch/develop.svg "Current test coverage for the develop branch"
 [Current coverage status]: https://coveralls.io/r/eloquent/mooch
 [Semantic versioning]: http://semver.org/
-[version-image]: http://img.shields.io/:semver-0.1.2-brightgreen.svg "This project uses semantic versioning"
+[version-image]: http://img.shields.io/:semver-0.1.3-brightgreen.svg "This project uses semantic versioning"
