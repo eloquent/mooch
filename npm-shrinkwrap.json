@@ -1,6 +1,6 @@
 {
   "name": "mooch",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "dependencies": {
     "moment": {
       "version": "2.5.1",
