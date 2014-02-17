@@ -138,9 +138,9 @@ this in a single line (at least in bash):
 [Twitter API]: https://dev.twitter.com/docs/api
 [Twitter officially retired version 1.0 of their API]: https://dev.twitter.com/blog/api-v1-is-retired
 
-[build-image]: http://img.shields.io/travis/eloquent/php-lcs/develop.svg "Current build status for the develop branch"
-[Current build status]: https://travis-ci.org/eloquent/php-lcs
-[coverage-image]: http://img.shields.io/coveralls/eloquent/php-lcs/develop.svg "Current test coverage for the develop branch"
-[Current coverage status]: https://coveralls.io/r/eloquent/php-lcs
+[build-image]: http://img.shields.io/travis/eloquent/mooch/develop.svg "Current build status for the develop branch"
+[Current build status]: https://travis-ci.org/eloquent/mooch
+[coverage-image]: http://img.shields.io/coveralls/eloquent/mooch/develop.svg "Current test coverage for the develop branch"
+[Current coverage status]: https://coveralls.io/r/eloquent/mooch
 [Semantic versioning]: http://semver.org/
 [version-image]: http://img.shields.io/:semver-0.1.2-brightgreen.svg "This project uses semantic versioning"
