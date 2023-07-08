@@ -1,3 +1,7 @@
+> # No longer maintained
+>
+> This package is no longer maintained.
+
 # Mooch
 
 *A simple Twitter OAuth proxy.*
